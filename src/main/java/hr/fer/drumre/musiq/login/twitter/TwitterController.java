@@ -72,7 +72,7 @@ public class TwitterController {
 		return redirectView;
 	}
 
-	@GetMapping("/user/twitterCallback")
+	@GetMapping("/user/twitterCallback")	
 	public RedirectView twitterCallback(@RequestParam(value = "oauth_token", required = false) String oauthToken,
 			@RequestParam(value = "oauth_verifier", required = false) String oauthVerifier,
 			@RequestParam(value = "denied", required = false) String denied, HttpServletRequest request,

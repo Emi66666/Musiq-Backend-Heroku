@@ -35,7 +35,7 @@ public class TopTracksService {
 	@Autowired 
 	TrackService trackService;
 	
-	@Scheduled(fixedDelay = 600000 * 24) //every day
+	//@Scheduled(fixedDelay = 600000 * 24) //every day TODO uncomment
 	public void addTopTracks() {
 		LOGGER.info("Adding today's top tracks from Lastfm!");
 		

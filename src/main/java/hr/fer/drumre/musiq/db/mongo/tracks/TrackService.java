@@ -3,12 +3,17 @@ package hr.fer.drumre.musiq.db.mongo.tracks;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import hr.fer.drumre.musiq.api.lastfm.LastfmRestClient;
+import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrack;
 import hr.fer.drumre.musiq.api.spotify.SpotifyRestClient;
+import hr.fer.drumre.musiq.api.spotify.dto.SpotifyTrack;
 
 @Service
 public class TrackService {
@@ -17,7 +22,12 @@ public class TrackService {
 	TrackRepository repo;
 	
 	@Autowired
-	SpotifyRestClient spotifyRestClient;
+	SpotifyRestClient spotify;
+	
+	@Autowired
+	LastfmRestClient lastfm;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TrackService.class.getName());
 
 	public long totalTracks() {
 		return repo.count();
@@ -39,7 +49,29 @@ public class TrackService {
 	}
 	
 	public List<Track> search(String query) {
-		return repo.searchName(query);
+		List<Track> result = repo.searchName(query);
+		if (result.size() == 0) {
+			LOGGER.info("Searching Spotify for {}", query);
+			List<SpotifyTrack> sTracks = spotify.search(query, 10);
+			LOGGER.info("Found {} potential new tracks", sTracks.size());
+			for (SpotifyTrack sTrack : sTracks) {
+				List<LastfmTrack> tracks = lastfm.search(sTrack.getName(), 1);
+				if (tracks == null || tracks.size() == 0) continue;
+				LastfmTrack lTrack = tracks.get(0);
+				AudioFeatures af = spotify.getAudioFeatures(sTrack.getId());
+				
+				Track t = new Track();
+				t.addData(lTrack);
+				t.addData(sTrack);
+				t.addData(af);
+				repo.save(t);
+				result.add(t);
+				
+				LOGGER.info("Adding {} to our database", t.getName());
+			}
+		}
+		if (result.size()>60) return result.subList(0, 60);
+		else return result;
 	}
 	
 	public void updateTrack(Track track) {

@@ -17,9 +17,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import hr.fer.drumre.musiq.Util;
+import hr.fer.drumre.musiq.api.lastfm.dto.LastfmSearchResult;
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrack;
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrackWrapper;
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTracksWrapper;
+import hr.fer.drumre.musiq.api.lastfm.dto.LastfmSearchResult.Mbid;
 
 @Component
 public class LastfmRestClient {
@@ -58,10 +60,7 @@ public class LastfmRestClient {
 			try {
 				responseEntity = rest.exchange(url, method, requestEntity, responseType);
 			} catch (Exception ex) {
-				LOGGER.info("Received 502 Bad Gateway, will try again in 10s");
-				requestEntity = new HttpEntity<String>("", headers);
-				Util.sleep(10000);
-				continue;
+				ex.printStackTrace();
 			}
 			HttpStatus statusCode = responseEntity.getStatusCode();
 			if (statusCode.equals(HttpStatus.TOO_MANY_REQUESTS)) {
@@ -134,6 +133,30 @@ public class LastfmRestClient {
 		return tracks;
 
 	}
+	
+	public List<LastfmTrack> search(String query, int limit) {
+		String urlComplete = UriComponentsBuilder.fromHttpUrl(URL)
+				.queryParam("api_key", key)
+				.queryParam("format", "json")
+				.queryParam("method", "track.search")
+				.queryParam("track", query)
+				.encode()
+		        .toUriString();
+		
+		LastfmSearchResult result = makeRequest(urlComplete, HttpMethod.GET, LastfmSearchResult.class);
+		
+		List<LastfmTrack> tracks = new ArrayList<>();
+		int count = 0;
+		for (Mbid mbid : result.getResults().getTrackmatches().getTrack()) {
+			if (count >= 10) break;
+			if (mbid.equals("")) continue;
+			LastfmTrack lTrack = getTrack(mbid.getMbid());
+			if (lTrack != null) tracks.add(lTrack);
+			count++;
+		}
+		return tracks;
+	}
+	
 	
 	
 }

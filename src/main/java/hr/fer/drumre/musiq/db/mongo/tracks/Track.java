@@ -94,6 +94,8 @@ public class Track implements Comparable<Track> {
 		this.setDuration(sTrack.getDuration());
 		this.setExplicit(sTrack.isExplicit());
 		this.setSpotifyPopularity(sTrack.getPopularity());
+		
+		if (this.spotify_id == null || this.spotify_id.equals("")) this.setLastfm_url(sTrack.getId());
 	}
 	
 	public void addData(AudioFeatures audioFeatures) {
@@ -103,6 +105,7 @@ public class Track implements Comparable<Track> {
 	public void addData(LastfmTrack lTrack) {
 		this.setLastfmListeners(lTrack.getListeners());
 		this.setLastfmPlaycount(lTrack.getPlaycount());
+		if (this.lastfm_url == null || this.lastfm_url.equals("")) this.setLastfm_url(lTrack.getUrl());
 	}
 	
 	public void increaseLikeNumber() {

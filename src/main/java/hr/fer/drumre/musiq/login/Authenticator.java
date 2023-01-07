@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import hr.fer.drumre.musiq.db.mongo.users.User;
 import hr.fer.drumre.musiq.db.mongo.users.UserService;
 import hr.fer.drumre.musiq.login.facebook.FacebookTokenVerifier;
+import hr.fer.drumre.musiq.login.google.GoogleTokenVerifier;
 import hr.fer.drumre.musiq.login.twitter.TwitterTokenVerifier;
 
 @Service
@@ -20,6 +21,9 @@ public class Authenticator {
 	@Autowired
 	TwitterTokenVerifier twTokenVerifier;
 	
+	@Autowired
+	GoogleTokenVerifier gTokenVerifier;
+	
 	public User authenticate(String id, String token, String secret) {
 		User user = userService.findUserById(id);
 		
@@ -32,6 +36,10 @@ public class Authenticator {
 			break;
 		case TWITTER:
 			if (!twTokenVerifier.verifyUser(id, token, secret))
+				return null;
+			break;
+		case GOOGLE:
+			if (!gTokenVerifier.verifyUser(id, token)) 
 				return null;
 			break;
 		}

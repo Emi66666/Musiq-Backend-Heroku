@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import hr.fer.drumre.musiq.Util;
 import hr.fer.drumre.musiq.api.spotify.dto.SpotifyTrack;
 import hr.fer.drumre.musiq.db.mongo.tracks.AudioFeatures;
 import hr.fer.drumre.musiq.db.mongo.tracks.Track;
@@ -26,11 +27,12 @@ public class SpotifyUpdateTracksService {
 	@Autowired
 	SpotifyRestClient restClient;
 	
-	@Scheduled(fixedDelay = 600000 * 24 * 7, initialDelay = 600000 * 24 * 7) //every week
+	@Scheduled(fixedDelay = 600000 * 24 * 7, initialDelay = 600000 * 24 * 7) //every week TODO add initial delay
 	public void updateTracks() {
 		int tracksPerRequest = 50;
 		long numTracks = trackRepo.count();
-		for (long i = 32000; i <= numTracks; i+=tracksPerRequest) {
+		for (long i = 34500; i <= numTracks; i+=tracksPerRequest) {
+			if (i % 1000 == 0) Util.sleep(35000);
 			LOGGER.info("Updating all tracks in database with info from Spotify {} / {}", i, numTracks);
 			List<Track> tracks = trackRepo.findAll(PageRequest.of((int) (i / tracksPerRequest), tracksPerRequest)).stream()
 					.filter(track -> track.getSpotify_id() != null)

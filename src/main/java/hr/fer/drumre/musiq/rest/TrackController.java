@@ -95,7 +95,10 @@ public class TrackController {
 
 	@GetMapping("/track/search")
 	public List<Track> search(@RequestParam String query) {
+		LOGGER.info("Searching database for {}", query);
 		List<Track> tracks = service.search(query);
+		tracks.sort((t1, t2) -> t1.getSpotifyPopularity() - t2.getSpotifyPopularity());
+		LOGGER.info("Found {} results for {}", tracks.size(), query);
 		return tracks;
 	}
 
@@ -148,10 +151,11 @@ public class TrackController {
 
 	@Data
 	@NoArgsConstructor
+	public
 	static class UserIdAndTokenAndSecret {
-		private String id;
-		private String token;
-		private String secret;
+		public String id;
+		public String token;
+		public String secret;
 	}
 
 }

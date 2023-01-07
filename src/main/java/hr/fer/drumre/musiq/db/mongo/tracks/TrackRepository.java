@@ -13,7 +13,9 @@ public interface TrackRepository extends MongoRepository<Track, String>{
 	
 	List<Track> findByNameExists(boolean exists);
 	
-	@Query(" {name : { '$regex' : /?0/i } } ")
+	@Query(" {name : { '$regex' : /?0/i, '$options' : 'i' } } ")
 	List<Track> searchName(String name);
+	
+	
 	
 }
