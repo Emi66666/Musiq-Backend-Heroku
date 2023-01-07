@@ -1,5 +1,6 @@
 package hr.fer.drumre.musiq.rest;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -30,11 +31,11 @@ import lombok.NoArgsConstructor;
 public class TrackController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrackController.class.getName());
-	
+
 	@Autowired
 	TrackService service;
-	
-	@Autowired 
+
+	@Autowired
 	TrackRecommenderService recommender;
 
 	@Autowired
@@ -42,47 +43,50 @@ public class TrackController {
 
 	@Autowired
 	Authenticator auth;
-	
-	@GetMapping("/track/popular") 
-	public List<Track> getPopular(@RequestParam(required=false) int count, @RequestParam(required=false) int page) {
-		if (count==0) count = 10;
+
+	@GetMapping("/track/popular")
+	public List<Track> getPopular(@RequestParam(required = false) int count, @RequestParam(required = false) int page) {
+		if (count == 0)
+			count = 10;
 		List<Track> popularTracks = service.getPopular(count, page);
 		return popularTracks;
 	}
-	
-	@GetMapping("/track/hot") 
-	public List<Track> getHot(@RequestParam(required=false) int count, @RequestParam(required=false) int page) {
-		if (count==0) count = 10;
+
+	@GetMapping("/track/hot")
+	public List<Track> getHot(@RequestParam(required = false) int count, @RequestParam(required = false) int page) {
+		if (count == 0)
+			count = 10;
 		List<Track> popularTracks = service.getHot(count, page);
 		return popularTracks;
 	}
-	
-	@GetMapping("/track/recommended")
-	public List<Track> getRecommended(@RequestParam(required=false) int count, @RequestParam(required=false) int page, 
-			@RequestParam String id,
-			@RequestParam String token,
-			@RequestParam(required=false) String secret) {
-	
-		LOGGER.info("User requested recommended");
-		
-		if (count==0) count = 10;
 
+	@GetMapping("/track/recommended")
+	public List<Track> getRecommended(@RequestParam(required = false) int count,
+			@RequestParam(required = false) int page, @RequestParam String id, @RequestParam String token,
+			@RequestParam(required = false) String secret) {
+
+		LOGGER.info("User requested recommended");
+
+		if (count == 0)
+			count = 10;
 
 		User user = auth.authenticate(id, token, secret);
-		if (user == null) return null;
-		
-		int requiredSize = page*count+count;
-		
+		if (user == null)
+			return null;
+
+		int requiredSize = page * count + count;
+
 		List<String> recommendedTrackIds = user.getRecommendedTrackIds();
-		if (recommendedTrackIds == null || recommendedTrackIds.size()==0 || recommendedTrackIds.size() < requiredSize) {
+		if (recommendedTrackIds == null || recommendedTrackIds.size() == 0
+				|| recommendedTrackIds.size() < requiredSize) {
 			LOGGER.info("Need to calculate new");
 			recommender.awaitCalculateSimilar(user, requiredSize, token, secret);
 			recommendedTrackIds = user.getRecommendedTrackIds();
 		}
-		
+
 		LOGGER.info("Returning recommended");
 		List<Track> recommendedTracks = recommendedTrackIds.stream().map(tid -> service.getTrack(tid)).toList();
-		return recommendedTracks.subList(page*count, page*count+count);
+		return recommendedTracks.subList(page * count, page * count + count);
 	}
 
 	@GetMapping("/track/{id}")
@@ -103,13 +107,15 @@ public class TrackController {
 	}
 
 	@PostMapping("/track/{id}/like")
-	public boolean likeTrack(@PathVariable(value = "id") String songId, @RequestBody UserIdAndTokenAndSecret idAndTokenAndSecret) {
+	public boolean likeTrack(@PathVariable(value = "id") String songId,
+			@RequestBody UserIdAndTokenAndSecret idAndTokenAndSecret) {
 		String userId = idAndTokenAndSecret.id;
 		String token = idAndTokenAndSecret.token;
 		String tokenSecret = idAndTokenAndSecret.secret;
 
 		User user = auth.authenticate(userId, token, tokenSecret);
-		if (user == null) return false;
+		if (user == null)
+			return false;
 
 		Track track = service.getTrack(songId);
 		if (track == null)
@@ -126,13 +132,15 @@ public class TrackController {
 	}
 
 	@PostMapping("/track/{id}/dislike")
-	public boolean dislikeTrack(@PathVariable(value = "id") String songId, @RequestBody UserIdAndTokenAndSecret idAndTokenAndSecret) {
+	public boolean dislikeTrack(@PathVariable(value = "id") String songId,
+			@RequestBody UserIdAndTokenAndSecret idAndTokenAndSecret) {
 		String userId = idAndTokenAndSecret.id;
 		String token = idAndTokenAndSecret.token;
 		String tokenSecret = idAndTokenAndSecret.secret;
 
 		User user = auth.authenticate(userId, token, tokenSecret);
-		if (user == null) return false;
+		if (user == null)
+			return false;
 
 		Track track = service.getTrack(songId);
 		if (track == null)
@@ -144,15 +152,26 @@ public class TrackController {
 			userService.updateUser(user);
 			service.updateTrack(track);
 			recommender.calculateSimilar(user, 99, token, tokenSecret);
-		} 
-		
+		}
+
 		return true;
+	}
+
+	@GetMapping("/track/liked")
+	public List<Track> getLiked(@RequestParam String id, @RequestParam String token,
+			@RequestParam(required = false) String secret) {
+
+		User user = auth.authenticate(id, token, secret);
+		if (user == null)
+			return new LinkedList<>();
+
+		List<Track> likedTracks = service.getLiked(id);
+		return likedTracks;
 	}
 
 	@Data
 	@NoArgsConstructor
-	public
-	static class UserIdAndTokenAndSecret {
+	public static class UserIdAndTokenAndSecret {
 		public String id;
 		public String token;
 		public String secret;

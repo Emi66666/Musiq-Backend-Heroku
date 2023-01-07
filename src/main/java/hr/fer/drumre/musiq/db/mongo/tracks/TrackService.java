@@ -1,5 +1,6 @@
 package hr.fer.drumre.musiq.db.mongo.tracks;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import hr.fer.drumre.musiq.api.lastfm.LastfmRestClient;
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrack;
 import hr.fer.drumre.musiq.api.spotify.SpotifyRestClient;
 import hr.fer.drumre.musiq.api.spotify.dto.SpotifyTrack;
+import hr.fer.drumre.musiq.db.mongo.users.User;
+import hr.fer.drumre.musiq.db.mongo.users.UserService;
 
 @Service
 public class TrackService {
@@ -26,6 +29,9 @@ public class TrackService {
 	
 	@Autowired
 	LastfmRestClient lastfm;
+	
+	@Autowired
+	UserService userService;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(TrackService.class.getName());
 
@@ -78,6 +84,18 @@ public class TrackService {
 		repo.save(track);
 	}
 	
-	
+	public List<Track> getLiked(String userId) {
+		List<Track> likedTracks = new LinkedList<>();
+		
+		User user = userService.findUserById(userId);
+		
+		for (String trackId : user.getLikedTrackIds()) {
+			Optional<Track> track = repo.findById(trackId);
+			if (!track.isEmpty())
+				likedTracks.add(track.get());
+		}
+		
+		return likedTracks;
+	}
 	
 }
