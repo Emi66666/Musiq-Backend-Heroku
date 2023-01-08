@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import hr.fer.drumre.musiq.db.mongo.tracks.Track;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
+import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 
 @Service
 public class DbOperations {
@@ -18,6 +19,9 @@ public class DbOperations {
 	
 	@Autowired
 	TrackRepository trackRepo;
+	
+	@Autowired
+	TrackService trackService;
 	
 	public void updateTracks() {
 		int tracksPerRequest = 50;
@@ -29,7 +33,7 @@ public class DbOperations {
 			for (int j = 0; j < tracks.size(); j++) {
 				Track t = tracks.get(j);
 				t.calculatePopularity();
-				trackRepo.save(t);
+				trackService.saveTrack(t);
 			}
 
 		}

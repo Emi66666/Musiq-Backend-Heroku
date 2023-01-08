@@ -32,4 +32,10 @@ public class UserService {
 		return user.get();
 	}
 	
+	public double averageLiked() {
+		return repo.findAll().stream()
+			.mapToInt(user -> user.getLikedTrackIds().size())
+			.average()
+			.getAsDouble();
+	}
 }

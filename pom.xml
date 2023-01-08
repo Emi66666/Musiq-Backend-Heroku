@@ -8,9 +8,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>hr.fer.drumre</groupId>
-	<artifactId>Musiq</artifactId>
+	<artifactId>MusiqDeploy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Musiq</name>
+	<name>Musiq Deploy</name>
 	<description>Backend for Musiq</description>
 	<properties>
 		<java.version>17</java.version>

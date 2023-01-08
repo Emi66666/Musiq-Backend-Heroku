@@ -28,6 +28,10 @@ public class StatsController {
 		List<Stat> stats = new ArrayList<>();
 		stats.add(new Stat("tracks", trackService.totalTracks()));
 		stats.add(new Stat("users", userService.totalUsers()));
+		stats.add(new Stat("services", 4));
+		stats.add(new Stat("average likes per user", (long)userService.averageLiked()));
+		stats.add(new Stat("developers", 3));
+		stats.add(new Stat("recommendation metrics", 10));
 		return stats;
 	}
 	

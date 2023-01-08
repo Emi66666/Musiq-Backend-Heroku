@@ -67,10 +67,7 @@ public class SpotifyRestClient {
 			try {
 				responseEntity = rest.exchange(url, method, requestEntity, responseType);
 			} catch (Exception ex) {
-				LOGGER.info("Received 502 Bad Gateway, will try again in 10s");
-				requestEntity = new HttpEntity<String>("", headers);
-				Util.sleep(10000);
-				continue;
+				break;
 			}
 			HttpStatus statusCode = responseEntity.getStatusCode();
 			if (statusCode.equals(HttpStatus.TOO_MANY_REQUESTS)) {

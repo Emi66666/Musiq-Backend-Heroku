@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrack;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
+import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 
 @Service
 public class LastfmUpdateTracksService {
@@ -16,6 +17,9 @@ public class LastfmUpdateTracksService {
 	
 	@Autowired
 	TrackRepository trackRepo;
+	
+	@Autowired
+	TrackService trackService;
 	
 	@Autowired
 	LastfmRestClient restClient;
@@ -37,7 +41,7 @@ public class LastfmUpdateTracksService {
 					if (lTrack != null) {
 						track.addData(lTrack);
 						track.calculatePopularity();
-						trackRepo.save(track);
+						trackService.saveTrack(track);
 					}
 				}
 			});

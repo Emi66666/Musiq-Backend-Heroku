@@ -71,7 +71,7 @@ public class Track implements Comparable<Track> {
 		
 		for (Artist a1 : this.getArtists()) {
 			if (other.getArtists().contains(a1)) {
-				total += 1;
+				total += 2.5;
 			}
 		}
 		

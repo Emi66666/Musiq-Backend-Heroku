@@ -96,7 +96,7 @@ public class LastfmRestClient {
 				.encode()
 		        .toUriString();
 		
-		LastfmTrackWrapper result = makeRequest(urlComplete, HttpMethod.GET, LastfmTrackWrapper.class); // sometimes null for some reason? TODO research
+		LastfmTrackWrapper result = makeRequest(urlComplete, HttpMethod.GET, LastfmTrackWrapper.class); 
 		if (result != null) {
 			return result.getTrack();
 		} else {
@@ -149,7 +149,7 @@ public class LastfmRestClient {
 		int count = 0;
 		for (Mbid mbid : result.getResults().getTrackmatches().getTrack()) {
 			if (count >= 10) break;
-			if (mbid.equals("")) continue;
+			if (mbid.getMbid().equals("")) continue;
 			LastfmTrack lTrack = getTrack(mbid.getMbid());
 			if (lTrack != null) tracks.add(lTrack);
 			count++;

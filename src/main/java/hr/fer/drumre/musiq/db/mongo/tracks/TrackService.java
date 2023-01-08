@@ -70,7 +70,7 @@ public class TrackService {
 				t.addData(lTrack);
 				t.addData(sTrack);
 				t.addData(af);
-				repo.save(t);
+				saveTrack(t);
 				result.add(t);
 				
 				LOGGER.info("Adding {} to our database", t.getName());
@@ -82,6 +82,20 @@ public class TrackService {
 	
 	public void updateTrack(Track track) {
 		repo.save(track);
+	}
+	
+	public boolean saveTrack(Track track) {
+		if (track.getId() == null) {
+			repo.save(track);
+			return true;
+		}
+		else if (repo.findById(track.getId()).isPresent()) {
+			return false;
+		}
+		else {
+			repo.save(track);
+			return true;
+		}
 	}
 	
 	public List<Track> getLiked(int count, int page, String userId) {

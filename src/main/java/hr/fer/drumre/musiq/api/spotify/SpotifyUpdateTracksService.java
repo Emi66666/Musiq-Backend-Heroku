@@ -15,6 +15,7 @@ import hr.fer.drumre.musiq.api.spotify.dto.SpotifyTrack;
 import hr.fer.drumre.musiq.db.mongo.tracks.AudioFeatures;
 import hr.fer.drumre.musiq.db.mongo.tracks.Track;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
+import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 
 @Service
 public class SpotifyUpdateTracksService {
@@ -25,9 +26,12 @@ public class SpotifyUpdateTracksService {
 	TrackRepository trackRepo;
 	
 	@Autowired
+	TrackService trackService;
+	
+	@Autowired
 	SpotifyRestClient restClient;
 	
-	@Scheduled(fixedDelay = 600000 * 24 * 7, initialDelay = 600000 * 24 * 7) //every week TODO add initial delay
+	@Scheduled(fixedDelay = 600000 * 24 * 7, initialDelay = 600000 * 24 * 7) 
 	public void updateTracks() {
 		int tracksPerRequest = 50;
 		long numTracks = trackRepo.count();
@@ -59,7 +63,7 @@ public class SpotifyUpdateTracksService {
 				track.calculatePopularity();
 				//LOGGER.info("{} {}", track.getSpotify_id(), track.getName());
 				
-				trackRepo.save(track);
+				trackService.saveTrack(track);
 
 			}
 

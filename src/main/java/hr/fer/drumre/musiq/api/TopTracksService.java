@@ -35,7 +35,7 @@ public class TopTracksService {
 	@Autowired 
 	TrackService trackService;
 	
-	//@Scheduled(fixedDelay = 600000 * 24) //every day TODO uncomment
+	@Scheduled(fixedDelay = 600000 * 24, initialDelay = 600000 * 24) 
 	public void addTopTracks() {
 		LOGGER.info("Adding today's top tracks from Lastfm!");
 		
@@ -52,7 +52,7 @@ public class TopTracksService {
 			if (trackRepo.findByName(lTrack.getName()).size() > 0) continue;
 			
 			System.out.println(lTrack.getName());
-			List<SpotifyTrack> sTracks = spotifyRestClient.search(lTrack.getName() + " " + lTrack.getArtist().getName(), 1); // TODO currently, searchTracks queries Spotify for 50 tracks, look into adding option to only find 1 result
+			List<SpotifyTrack> sTracks = spotifyRestClient.search(lTrack.getName() + " " + lTrack.getArtist().getName(), 1); 
 			if (sTracks == null || sTracks.size() == 0) continue;
 			
 			SpotifyTrack sTrack = sTracks.get(0); 
@@ -67,7 +67,7 @@ public class TopTracksService {
 			track.calculatePopularity();
 			
 			LOGGER.info("Adding {} by {} to database", track.getName(), track.getArtists().stream().map(a -> a.getName()).collect(Collectors.toList()));
-			trackRepo.save(track);
+			trackService.saveTrack(track);
 		}
 		
 		LOGGER.info("Finished adding today's top tracks");
