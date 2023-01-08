@@ -45,7 +45,7 @@ public class Track implements Comparable<Track> {
 	private int likeNumber;
 	
 	public boolean isComplete() {
-		return spotify_id != null && mbid != null && name != null;
+		return spotify_id != null && name != null && lastfm_url != null;
 	}
 
 	
@@ -54,29 +54,32 @@ public class Track implements Comparable<Track> {
 	}
 	
 	public double similarityTo(Track other) {
-		if (!this.isComplete() || other.isComplete()) return 0;
+		if (!this.isComplete() || !other.isComplete()) return 0;
 		double total = 0;
 		AudioFeatures af1 = this.getAudio_features();
 		AudioFeatures af2 = other.getAudio_features();
-		total += 1-Math.abs(af1.getAcousticness()-af2.getAcousticness());
-		total += 1-Math.abs(af1.getDanceability()-af2.getDanceability());
-		total += 1-Math.abs(af1.getEnergy()-af2.getEnergy());
-		total += 1-Math.abs(af1.getLiveness()-af2.getLiveness());
-		total += 1-Math.abs(af1.getLoudness()-af2.getLoudness());
-		total += 1-Math.abs(af1.getTempo()-af2.getTempo());
-		total += 1-Math.abs(af1.getValence()-af2.getValence());
-		total += 1-Math.abs(af1.getInstrumentalness()-af2.getInstrumentalness());
-		total += 1-Math.abs(af1.getSpeechiness()-af2.getSpeechiness());
-		total += 0.25*(4-Math.abs(af1.getTime_signature()-af2.getTime_signature()));
+		if (af1 != null && af2 != null) {
+			total += 1-Math.abs(af1.getAcousticness()-af2.getAcousticness());
+			total += 1-Math.abs(af1.getDanceability()-af2.getDanceability());
+			total += 1-Math.abs(af1.getEnergy()-af2.getEnergy());
+			total += 1-Math.abs(af1.getLiveness()-af2.getLiveness());
+			total += Math.max(0,1-Math.abs(af1.getLoudness()/-60.0-af2.getLoudness()/-60.0));
+			total += Math.max(0, 1-Math.abs(af1.getTempo()/200.0-af2.getTempo()/200.0));
+			total += 1-Math.abs(af1.getValence()-af2.getValence());
+			total += 1-Math.abs(af1.getInstrumentalness()-af2.getInstrumentalness());
+			total += 1-Math.abs(af1.getSpeechiness()-af2.getSpeechiness());
+			total += 0.25*(4-Math.abs(af1.getTime_signature()-af2.getTime_signature()));
+		}
+		
 		
 		for (Artist a1 : this.getArtists()) {
 			if (other.getArtists().contains(a1)) {
-				total += 2.5;
+				total += 5;
 			}
 		}
 		
 		if (this.getAlbum().equals((other.getAlbum()))) {
-			total += 1.2;
+			total += 5;
 		}
 			
 		return total;

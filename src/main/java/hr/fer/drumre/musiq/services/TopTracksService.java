@@ -1,4 +1,4 @@
-package hr.fer.drumre.musiq.api;
+package hr.fer.drumre.musiq.services;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -29,8 +29,8 @@ import twitter4j.conf.ConfigurationBuilder;
 @CrossOrigin
 public class TwitterController {
 
-	private static final String TWITTERCALLBACKURL = "https://musiq-backend.herokuapp.com/user/twitterCallback";
-	private static final String MUSIQCALLBACKURL = "https://musiq-frontend.herokuapp.com/index.html";
+	private static final String TWITTERCALLBACKURL = "http://localhost:8080/user/twitterCallback";
+	private static final String MUSIQCALLBACKURL = "http://127.0.0.1:5501/index.html";
 	
 	@Value("${twitter.oauth.consumer.key}")
 	private String consumerKey;

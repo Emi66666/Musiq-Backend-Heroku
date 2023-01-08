@@ -1,4 +1,4 @@
-package hr.fer.drumre.musiq.api.spotify;
+package hr.fer.drumre.musiq.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import hr.fer.drumre.musiq.Util;
+import hr.fer.drumre.musiq.api.spotify.SpotifyRestClient;
 import hr.fer.drumre.musiq.api.spotify.dto.SpotifyTrack;
 import hr.fer.drumre.musiq.db.mongo.tracks.AudioFeatures;
 import hr.fer.drumre.musiq.db.mongo.tracks.Track;
@@ -35,8 +35,7 @@ public class SpotifyUpdateTracksService {
 	public void updateTracks() {
 		int tracksPerRequest = 50;
 		long numTracks = trackRepo.count();
-		for (long i = 34500; i <= numTracks; i+=tracksPerRequest) {
-			if (i % 1000 == 0) Util.sleep(35000);
+		for (long i = 0; i <= numTracks; i+=tracksPerRequest) {
 			LOGGER.info("Updating all tracks in database with info from Spotify {} / {}", i, numTracks);
 			List<Track> tracks = trackRepo.findAll(PageRequest.of((int) (i / tracksPerRequest), tracksPerRequest)).stream()
 					.filter(track -> track.getSpotify_id() != null)
@@ -49,7 +48,6 @@ public class SpotifyUpdateTracksService {
 			List<AudioFeatures> audioFeatures = restClient.getMultipleAudioFeatures(trackIds);
 			
 			if (audioFeatures==null || spotifyTracks==null) {
-				//LOGGER.info("Request fail, moving on");
 				continue;
 			}
 			

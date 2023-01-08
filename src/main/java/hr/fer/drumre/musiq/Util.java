@@ -18,7 +18,7 @@ public class Util {
 		for (T item : lst) {
 			if (q.size() < count) {
 				q.add(item);
-			} else if (item.compareTo(q.peek()) < 0) {
+			} else if (item.compareTo(q.peek()) > 0) {
 				q.add(item);
 				q.poll();
 			}

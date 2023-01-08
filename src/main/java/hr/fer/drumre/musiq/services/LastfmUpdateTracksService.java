@@ -1,4 +1,4 @@
-package hr.fer.drumre.musiq.api.lastfm;
+package hr.fer.drumre.musiq.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import hr.fer.drumre.musiq.api.lastfm.LastfmRestClient;
 import hr.fer.drumre.musiq.api.lastfm.dto.LastfmTrack;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;

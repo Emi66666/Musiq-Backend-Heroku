@@ -9,13 +9,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import hr.fer.drumre.musiq.api.TopTracksService;
-import hr.fer.drumre.musiq.api.lastfm.LastfmUpdateTracksService;
-import hr.fer.drumre.musiq.api.spotify.SpotifyUpdateTracksService;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 import hr.fer.drumre.musiq.login.facebook.FacebookTokenVerifier;
 import hr.fer.drumre.musiq.login.twitter.TwitterService;
+import hr.fer.drumre.musiq.services.LastfmUpdateTracksService;
+import hr.fer.drumre.musiq.services.SpotifyUpdateTracksService;
+import hr.fer.drumre.musiq.services.TopTracksService;
 
 @SpringBootApplication
 @EnableMongoRepositories

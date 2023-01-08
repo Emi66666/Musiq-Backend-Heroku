@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hr.fer.drumre.musiq.db.mongo.tracks.Track;
-import hr.fer.drumre.musiq.db.mongo.tracks.TrackRecommenderService;
 import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 import hr.fer.drumre.musiq.db.mongo.users.User;
 import hr.fer.drumre.musiq.db.mongo.users.UserService;
 import hr.fer.drumre.musiq.login.Authenticator;
-
+import hr.fer.drumre.musiq.services.TrackRecommenderService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -65,8 +64,6 @@ public class TrackController {
 			@RequestParam(required = false) int page, @RequestParam String id, @RequestParam String token,
 			@RequestParam(required = false) String secret) {
 
-		LOGGER.info("User requested recommended");
-
 		if (count == 0)
 			count = 10;
 
@@ -79,12 +76,10 @@ public class TrackController {
 		List<String> recommendedTrackIds = user.getRecommendedTrackIds();
 		if (recommendedTrackIds == null || recommendedTrackIds.size() == 0
 				|| recommendedTrackIds.size() < requiredSize) {
-			LOGGER.info("Need to calculate new");
 			recommender.awaitCalculateSimilar(user, requiredSize, token, secret);
 			recommendedTrackIds = user.getRecommendedTrackIds();
 		}
 
-		LOGGER.info("Returning recommended");
 		List<Track> recommendedTracks = recommendedTrackIds.stream().map(tid -> service.getTrack(tid)).toList();
 		return recommendedTracks.subList(page * count, page * count + count);
 	}

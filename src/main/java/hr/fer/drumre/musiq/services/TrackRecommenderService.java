@@ -1,4 +1,4 @@
-package hr.fer.drumre.musiq.db.mongo.tracks;
+package hr.fer.drumre.musiq.services;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import hr.fer.drumre.musiq.Util;
+import hr.fer.drumre.musiq.db.mongo.tracks.Track;
+import hr.fer.drumre.musiq.db.mongo.tracks.TrackRepository;
 import hr.fer.drumre.musiq.db.mongo.users.SocialNetwork;
 import hr.fer.drumre.musiq.db.mongo.users.User;
 import hr.fer.drumre.musiq.db.mongo.users.UserService;
@@ -29,6 +31,8 @@ public class TrackRecommenderService {
 	@Autowired
 	TwitterService twitterService;
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TrackRecommenderService.class.getName());
+	
 	private Map<User, Thread> recommenderThreads = new HashMap<>();
 	
 	public void calculateSimilar(User user, int count, String token, String secret) {
@@ -37,6 +41,7 @@ public class TrackRecommenderService {
 		}
 		
 		Thread thread = new Thread(() -> {
+			LOGGER.info("Recommending tracks for {}...", user.getName());
 			user.setRecommendedTrackIds(getSimilar(user, count, 0, token, secret));
 			userService.updateUser(user);
 			recommenderThreads.remove(user);
@@ -53,6 +58,7 @@ public class TrackRecommenderService {
 		final CountDownLatch latch = new CountDownLatch(1);
 		
 		Thread thread = new Thread(() -> {
+			LOGGER.info("Recommending...");
 			user.setRecommendedTrackIds(getSimilar(user, count, 0, token, secret));
 			userService.updateUser(user);
 			recommenderThreads.remove(user);
@@ -95,9 +101,7 @@ public class TrackRecommenderService {
 	}
 	
 	public List<Track> getSimilar(List<Track> tracks, List<Track> friendTracks, int count, int page) {
-		int numTracks = Math.max(Math.min(1200, (page*count+count)*15),2500);
-		
-		List<Track> all = repo.findAll(PageRequest.of(0, numTracks, Sort.by(Sort.Order.desc("popularity")))).toList();
+		List<Track> all = repo.findAll();
 		List<TrackSimilarity> trackSimilarities = all.stream().filter(t -> t.isComplete() && !tracks.contains(t)).map(t -> {return new TrackSimilarity(t, tracks, friendTracks);}).toList();		
 		List<TrackSimilarity> topK = Util.heapselect(trackSimilarities, page*count + count).subList(page*count, page*count + count);
 		return topK.stream().map(ts -> ts.track).toList();
@@ -113,8 +117,9 @@ public class TrackRecommenderService {
 				this.similarity += track.similarityTo(t);
 			}
 			for (Track t : friendTracks) {
-				this.similarity += track.similarityTo(t)/4;
+				this.similarity += track.similarityTo(t)/4.0;
 			}
+			this.similarity += 0.25*compareTracks.size()*25.0 * track.getSpotifyPopularity()/100.0;
 		}
 		@Override
 		public int compareTo(TrackSimilarity o) {

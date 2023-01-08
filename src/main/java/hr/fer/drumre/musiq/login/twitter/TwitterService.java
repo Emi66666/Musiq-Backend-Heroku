@@ -3,13 +3,10 @@ package hr.fer.drumre.musiq.login.twitter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import hr.fer.drumre.musiq.db.mongo.tracks.TrackService;
 import hr.fer.drumre.musiq.db.mongo.users.User;
 import hr.fer.drumre.musiq.db.mongo.users.UserService;
 import twitter4j.IDs;
@@ -21,8 +18,6 @@ import twitter4j.conf.ConfigurationBuilder;
 
 @Service
 public class TwitterService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(TrackService.class.getName());
 
 	@Value("${twitter.oauth.consumer.key}")
 	private String consumerKey;
@@ -69,7 +64,7 @@ public class TwitterService {
 				}
 			} while (ids.hasNext());
 		} catch (TwitterException e) {
-			LOGGER.info("Error while getting followers");
+			//LOGGER.info("Error while getting followers");
 		}
 
 		return followers;
