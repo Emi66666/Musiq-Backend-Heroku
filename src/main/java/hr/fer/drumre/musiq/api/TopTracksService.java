@@ -35,7 +35,7 @@ public class TopTracksService {
 	@Autowired 
 	TrackService trackService;
 	
-	@Scheduled(fixedDelay = 600000 * 24, initialDelay = 600000 * 24) 
+	@Scheduled(fixedDelay = 600000 * 24, initialDelay = 600000 * 24)  
 	public void addTopTracks() {
 		LOGGER.info("Adding today's top tracks from Lastfm!");
 		
@@ -51,7 +51,6 @@ public class TopTracksService {
 			if (trackRepo.findByMbid(lTrack.getMbid()).size() > 0) continue;
 			if (trackRepo.findByName(lTrack.getName()).size() > 0) continue;
 			
-			System.out.println(lTrack.getName());
 			List<SpotifyTrack> sTracks = spotifyRestClient.search(lTrack.getName() + " " + lTrack.getArtist().getName(), 1); 
 			if (sTracks == null || sTracks.size() == 0) continue;
 			

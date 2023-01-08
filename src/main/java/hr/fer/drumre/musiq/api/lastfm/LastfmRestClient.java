@@ -111,7 +111,7 @@ public class LastfmRestClient {
 		boolean stop = false;
 		int page = 1;
 	
-		while (!stop || page >= 10) {
+		while (!stop && page <= 10) {
 			String urlComplete = UriComponentsBuilder.fromHttpUrl(URL)
 					.queryParam("api_key", key)
 					.queryParam("format", "json")
