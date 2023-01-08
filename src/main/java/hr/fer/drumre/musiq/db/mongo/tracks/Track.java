@@ -95,7 +95,7 @@ public class Track implements Comparable<Track> {
 		this.setExplicit(sTrack.isExplicit());
 		this.setSpotifyPopularity(sTrack.getPopularity());
 		
-		if (this.spotify_id == null || this.spotify_id.equals("")) this.setLastfm_url(sTrack.getId());
+		if (this.spotify_id == null || this.spotify_id.equals("")) this.setSpotify_id(sTrack.getId());
 	}
 	
 	public void addData(AudioFeatures audioFeatures) {
