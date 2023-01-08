@@ -100,7 +100,6 @@ public class TwitterController {
 		
 		String userId = Long.toString(token.getUserId());
 		String email;
-		// TODO: Need to find a way to save twitter
 		try {
 			twitter4j.User twitterUser = twitter.verifyCredentials();
 			email = twitterUser.getEmail();
@@ -114,7 +113,6 @@ public class TwitterController {
 		user.setName(token.getScreenName());
 		user.setEmail(email);
 		
-		// TODO: Given id must not be null?
 		service.saveUser(user);
 		
 		RedirectView redirectView = new RedirectView();
