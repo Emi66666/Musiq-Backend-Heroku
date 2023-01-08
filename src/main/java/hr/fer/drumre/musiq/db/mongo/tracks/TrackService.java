@@ -84,12 +84,24 @@ public class TrackService {
 		repo.save(track);
 	}
 	
-	public List<Track> getLiked(String userId) {
+	public List<Track> getLiked(int count, int page, String userId) {
 		List<Track> likedTracks = new LinkedList<>();
 		
 		User user = userService.findUserById(userId);
+		if (user == null)
+			return likedTracks;
 		
-		for (String trackId : user.getLikedTrackIds()) {
+		List<String> allLikedTracksIds = user.getLikedTrackIds();
+		
+		int fromIndex = count * page;
+		if (fromIndex < 0 || fromIndex >= allLikedTracksIds.size())
+			return likedTracks;
+		
+		int toIndex = fromIndex + count;
+		if (toIndex > allLikedTracksIds.size())
+			toIndex = allLikedTracksIds.size();
+		
+		for (String trackId : user.getLikedTrackIds().subList(fromIndex, toIndex)) {
 			Optional<Track> track = repo.findById(trackId);
 			if (!track.isEmpty())
 				likedTracks.add(track.get());

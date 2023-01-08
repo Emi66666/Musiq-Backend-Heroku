@@ -158,14 +158,14 @@ public class TrackController {
 	}
 
 	@GetMapping("/track/liked")
-	public List<Track> getLiked(@RequestParam String id, @RequestParam String token,
-			@RequestParam(required = false) String secret) {
+	public List<Track> getLiked(@RequestParam(required = false) int count, @RequestParam(required = false) int page,
+			@RequestParam String id, @RequestParam String token, @RequestParam(required = false) String secret) {
 
 		User user = auth.authenticate(id, token, secret);
 		if (user == null)
 			return new LinkedList<>();
 
-		List<Track> likedTracks = service.getLiked(id);
+		List<Track> likedTracks = service.getLiked(count, page, id);
 		return likedTracks;
 	}
 
